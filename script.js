@@ -119,12 +119,16 @@ function main() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
+    let start = false
+    let startColor = getRandomColor();
+
     let score = 0;
     let enemies = [];
     const WAVE_AMT = 75;
     spawnEnemies(enemies, WAVE_AMT);
-    let mouseX = 0;
-    let mouseY = 0;
+    let mouseX = undefined;
+    let mouseY = undefined;
+
 
     let gameOverText = `Game Over! Score ${score}`;
     let gameOverTextPos = {
@@ -135,6 +139,7 @@ function main() {
     canvas.addEventListener("mousemove", (e) => {
         mouseX = e.clientX;
         mouseY = e.clientY;
+        start = true;
     });
 
     function loop() {
@@ -143,15 +148,22 @@ function main() {
         ctx.fill();
 
 
-        moveEnemies(enemies);
-        drawEnemies(ctx, enemies);
-        removeEnemies(enemies, canvas);
+        if(start) {
+            moveEnemies(enemies);
+            drawEnemies(ctx, enemies);
+            removeEnemies(enemies, canvas);
+            //displayScore();
+        }
 
         if(checkMouseRectCollision(enemies, mouseX, mouseY)) {
             ctx.font = `120px Arial`;            
             ctx.fillText(gameOverText, gameOverTextPos.x, gameOverTextPos.y); 
-        }
-        else {
+        } else if(!start){
+            ctx.font = `120px Arial`;            
+            ctx.fillStyle = startColor;
+            ctx.fillText("Move Mouse to start game", gameOverTextPos.x, gameOverTextPos.y); 
+            window.requestAnimationFrame(loop);
+        } else {
             window.requestAnimationFrame(loop);
         }
         score++;
